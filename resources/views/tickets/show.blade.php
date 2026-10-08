@@ -103,39 +103,15 @@
                 </div>
             @endif
 
-            <!-- Form Rating Kepuasan (CSAT) untuk Pelapor -->
-            @if ($ticket->status === 'selesai' && $ticket->user_id === auth()->id() && !$ticket->rating_kepuasan)
-                <div class="panel p-6 border-2 border-amber-300 bg-amber-50/30">
-                    <h4 class="text-sm font-bold text-amber-900">Evaluasi Kepuasan Layanan (CSAT)</h4>
-                    <p class="text-xs text-amber-700 mt-1">Bantu kami meningkatkan mutu pelayanan SMA Binaul Ummah dengan memberikan rating atas penanganan tiket ini.</p>
-                    <form method="POST" action="{{ route('tickets.rate', $ticket) }}" class="mt-4 space-y-4">
-                        @csrf
-                        <div>
-                            <label class="label-modern">Skala Kepuasan (1 - 5 Bintang)</label>
-                            <select name="rating_kepuasan" class="input-modern">
-                                <option value="5">⭐⭐⭐⭐⭐ 5 - Sangat Memuaskan & Cepat</option>
-                                <option value="4">⭐⭐⭐⭐ 4 - Memuaskan</option>
-                                <option value="3">⭐⭐⭐ 3 - Cukup Baik</option>
-                                <option value="2">⭐⭐ 2 - Kurang Memuaskan</option>
-                                <option value="1">⭐ 1 - Sangat Lambat / Tidak Puas</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="label-modern">Ulasan / Masukan (Opsional)</label>
-                            <textarea name="ulasan_kepuasan" rows="2" class="input-modern" placeholder="Tuliskan saran untuk perbaikan layanan ke depan..."></textarea>
-                        </div>
-                        <button type="submit" class="btn-primary text-xs !bg-amber-600 hover:!bg-amber-700">Kirim Penilaian Mutu</button>
-                    </form>
-                </div>
-            @elseif ($ticket->rating_kepuasan)
-                <div class="panel p-5 bg-emerald-50/50 border border-emerald-200">
-                    <span class="text-xs font-bold text-emerald-800 uppercase">Indeks Kepuasan Pelapor (CSAT)</span>
-                    <div class="mt-1 flex items-center gap-2">
-                        <span class="text-xl font-bold text-slate-900">{{ $ticket->rating_kepuasan }} / 5 Bintang</span>
+            @if ($ticket->status === 'selesai')
+                <div class="panel p-5 bg-emerald-50/60 border border-emerald-200">
+                    <div class="flex items-center gap-2">
+                        <span class="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-600 text-white text-xs font-bold">✓</span>
+                        <h4 class="text-xs font-bold text-emerald-900 uppercase">Tiket Telah Selesai Ditangani</h4>
                     </div>
-                    @if ($ticket->ulasan_kepuasan)
-                        <p class="mt-2 text-xs text-slate-600 italic">"{{ $ticket->ulasan_kepuasan }}"</p>
-                    @endif
+                    <p class="text-xs text-emerald-800 mt-1.5 leading-relaxed">
+                        Layanan atau keluhan ini telah diselesaikan oleh pihak manajemen/petugas sekolah SMA Binaul Ummah pada {{ $ticket->resolved_at ? $ticket->resolved_at->format('d M Y H:i') : $ticket->updated_at->format('d M Y H:i') }}.
+                    </p>
                 </div>
             @endif
         </div>

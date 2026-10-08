@@ -32,33 +32,95 @@
                     </div>
                 @endif
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <!-- Kategori -->
-                    <div>
-                        <label class="label-modern">Kategori Layanan <span class="text-rose-500">*</span></label>
-                        <select name="kategori" class="input-modern" required>
-                            <option value="akademik" {{ old('kategori') === 'akademik' ? 'selected' : '' }}>Akademik & Pembelajaran</option>
-                            <option value="fasilitas" {{ old('kategori') === 'fasilitas' ? 'selected' : '' }}>Fasilitas & Sarana Prasarana</option>
-                            <option value="keuangan" {{ old('kategori') === 'keuangan' ? 'selected' : '' }}>Keuangan & Biaya Sekolah</option>
-                            <option value="kedisiplinan" {{ old('kategori') === 'kedisiplinan' ? 'selected' : '' }}>Kedisiplinan & Tata Tertib</option>
-                            <option value="layanan_konseling" {{ old('kategori') === 'layanan_konseling' ? 'selected' : '' }}>Bimbingan Konseling (BK)</option>
-                            <option value="administrasi" {{ old('kategori') === 'administrasi' ? 'selected' : '' }}>Administrasi & Tata Usaha</option>
-                            <option value="ekstrakurikuler" {{ old('kategori') === 'ekstrakurikuler' ? 'selected' : '' }}>Ekstrakurikuler & Organisasi</option>
-                        </select>
-                        <x-input-error :messages="$errors->get('kategori')" class="mt-1" />
+                <!-- Kategori -->
+                <div>
+                    <label class="label-modern">Kategori Layanan <span class="text-rose-500">*</span></label>
+                    <select name="kategori" class="input-modern" required>
+                        <option value="akademik" {{ old('kategori') === 'akademik' ? 'selected' : '' }}>Akademik & Pembelajaran</option>
+                        <option value="fasilitas" {{ old('kategori') === 'fasilitas' ? 'selected' : '' }}>Fasilitas & Sarana Prasarana</option>
+                        <option value="keuangan" {{ old('kategori') === 'keuangan' ? 'selected' : '' }}>Keuangan & Biaya Sekolah</option>
+                        <option value="kedisiplinan" {{ old('kategori') === 'kedisiplinan' ? 'selected' : '' }}>Kedisiplinan & Tata Tertib</option>
+                        <option value="layanan_konseling" {{ old('kategori') === 'layanan_konseling' ? 'selected' : '' }}>Bimbingan Konseling (BK)</option>
+                        <option value="administrasi" {{ old('kategori') === 'administrasi' ? 'selected' : '' }}>Administrasi & Tata Usaha</option>
+                        <option value="ekstrakurikuler" {{ old('kategori') === 'ekstrakurikuler' ? 'selected' : '' }}>Ekstrakurikuler & Organisasi</option>
+                    </select>
+                    <x-input-error :messages="$errors->get('kategori')" class="mt-1" />
+                </div>
+
+                <!-- Urgensi dengan Panduan Lengkap -->
+                <div x-data="{ selectedUrgensi: '{{ old('urgensi', 'sedang') }}' }">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="label-modern !mb-0">Tingkat Urgensi <span class="text-rose-500">*</span></label>
+                        <span class="text-[11px] text-slate-500 font-medium">Pilih sesuai skala dampak pada pembelajaran</span>
                     </div>
 
-                    <!-- Urgensi -->
-                    <div>
-                        <label class="label-modern">Tingkat Urgensi <span class="text-rose-500">*</span></label>
-                        <select name="urgensi" class="input-modern" required>
-                            <option value="rendah" {{ old('urgensi') === 'rendah' ? 'selected' : '' }}>Rendah (Aspirasi biasa / info umum)</option>
-                            <option value="sedang" {{ old('urgensi', 'sedang') === 'sedang' ? 'selected' : '' }}>Sedang (Kendala standar, tanggap 24-48 jam)</option>
-                            <option value="tinggi" {{ old('urgensi') === 'tinggi' ? 'selected' : '' }}>Tinggi (Mengganggu KBM, tanggap &lt; 24 jam)</option>
-                            <option value="darurat" {{ old('urgensi') === 'darurat' ? 'selected' : '' }}>Darurat (Keamanan / medis / mendesak)</option>
-                        </select>
-                        <x-input-error :messages="$errors->get('urgensi')" class="mt-1" />
+                    <!-- Radio Grid Pilihan Urgensi -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <!-- Rendah -->
+                        <label class="relative flex flex-col p-3 rounded-xl border cursor-pointer transition"
+                            :class="selectedUrgensi === 'rendah' ? 'border-emerald-500 bg-emerald-50/40 ring-1 ring-emerald-500' : 'border-slate-200 bg-white hover:bg-slate-50'">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                                    <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                                    Rendah (Aspirasi / Saran)
+                                </span>
+                                <input type="radio" name="urgensi" value="rendah" x-model="selectedUrgensi" class="text-indigo-600 focus:ring-indigo-500" required>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-1.5 leading-relaxed">
+                                Usulan umum, pertanyaan info santai, atau ide ekskul. <strong>Tidak menghambat</strong> KBM.
+                            </p>
+                            <span class="text-[10px] text-emerald-700 font-semibold mt-1">Estimasi Tanggap: 3 - 5 Hari Kerja</span>
+                        </label>
+
+                        <!-- Sedang -->
+                        <label class="relative flex flex-col p-3 rounded-xl border cursor-pointer transition"
+                            :class="selectedUrgensi === 'sedang' ? 'border-amber-500 bg-amber-50/40 ring-1 ring-amber-500' : 'border-slate-200 bg-white hover:bg-slate-50'">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                                    <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+                                    Sedang (Kendala Standar)
+                                </span>
+                                <input type="radio" name="urgensi" value="sedang" x-model="selectedUrgensi" class="text-indigo-600 focus:ring-indigo-500">
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-1.5 leading-relaxed">
+                                Sarana minor berkendala, jadwal remedial, legalisir rapor. KBM tetap dapat berjalan.
+                            </p>
+                            <span class="text-[10px] text-amber-700 font-semibold mt-1">Estimasi Tanggap: 24 - 48 Jam</span>
+                        </label>
+
+                        <!-- Tinggi -->
+                        <label class="relative flex flex-col p-3 rounded-xl border cursor-pointer transition"
+                            :class="selectedUrgensi === 'tinggi' ? 'border-rose-500 bg-rose-50/40 ring-1 ring-rose-500' : 'border-slate-200 bg-white hover:bg-slate-50'">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                                    <span class="h-2 w-2 rounded-full bg-rose-500"></span>
+                                    Tinggi (Krusial / Gangguan KBM)
+                                </span>
+                                <input type="radio" name="urgensi" value="tinggi" x-model="selectedUrgensi" class="text-indigo-600 focus:ring-indigo-500">
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-1.5 leading-relaxed">
+                                Sarana vital mati (AC Lab Komputer mati total, alat ujian rusak) yang menghentikan KBM 1 kelas.
+                            </p>
+                            <span class="text-[10px] text-rose-700 font-semibold mt-1">Estimasi Tanggap: &lt; 24 Jam</span>
+                        </label>
+
+                        <!-- Darurat -->
+                        <label class="relative flex flex-col p-3 rounded-xl border cursor-pointer transition"
+                            :class="selectedUrgensi === 'darurat' ? 'border-red-600 bg-red-50/50 ring-2 ring-red-500' : 'border-slate-200 bg-white hover:bg-slate-50'">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-rose-800 flex items-center gap-1.5">
+                                    <span class="h-2 w-2 rounded-full bg-red-600 animate-ping"></span>
+                                    Darurat (Insiden / Keselamatan)
+                                </span>
+                                <input type="radio" name="urgensi" value="darurat" x-model="selectedUrgensi" class="text-rose-600 focus:ring-rose-500">
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-1.5 leading-relaxed">
+                                Kondisi keselamatan jiwa, perundungan berat, korsleting bahaya, atau krisis darurat sekolah.
+                            </p>
+                            <span class="text-[10px] text-rose-700 font-bold mt-1">Estimasi Tanggap: Segera (Hari yang Sama)</span>
+                        </label>
                     </div>
+                    <x-input-error :messages="$errors->get('urgensi')" class="mt-1" />
                 </div>
 
                 <!-- Judul -->

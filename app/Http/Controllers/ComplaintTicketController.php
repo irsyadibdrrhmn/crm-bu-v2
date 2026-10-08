@@ -70,8 +70,23 @@ class ComplaintTicketController extends Controller
             $lampiranPath = $request->file('lampiran')->store('tickets', 'public');
         }
 
-        $ticketCountToday = ComplaintTicket::whereDate('created_at', Carbon::today())->count() + 1;
-        $ticketNumber = 'TKT-' . date('Ym') . '-' . str_pad($ticketCountToday, 3, '0', STR_PAD_LEFT);
+        $prefix = 'TKT-' . date('Ym') . '-';
+        $latestTicket = ComplaintTicket::where('ticket_number', 'like', $prefix . '%')
+            ->orderByDesc('id')
+            ->first();
+
+        $nextNumber = 1;
+        if ($latestTicket && preg_match('/-(\d+)$/', $latestTicket->ticket_number, $matches)) {
+            $nextNumber = (int) $matches[1] + 1;
+        }
+
+        $ticketNumber = $prefix . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+
+        // Fallback safety to guarantee absolute uniqueness
+        while (ComplaintTicket::where('ticket_number', $ticketNumber)->exists()) {
+            $nextNumber++;
+            $ticketNumber = $prefix . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+        }
 
         $ticket = ComplaintTicket::create([
             'ticket_number' => $ticketNumber,
