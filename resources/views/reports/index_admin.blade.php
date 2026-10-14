@@ -1,17 +1,49 @@
 <x-app-layout>
     <x-slot name="header">
-        <div>
-            <div class="flex items-center gap-2">
-                <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Manajemen Kurikulum</span>
-                <span class="text-xs text-slate-400">/</span>
-                <span class="text-xs font-medium text-slate-500">Rekap Nilai Siswa</span>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Manajemen Kurikulum</span>
+                    <span class="text-xs text-slate-400">/</span>
+                    <span class="text-xs font-medium text-slate-500">Rekap Nilai Siswa</span>
+                </div>
+                <h1 class="mt-1 text-2xl font-bold text-slate-900 tracking-tight">Data Capaian Akademik Seluruh Siswa</h1>
+                <p class="text-xs text-slate-500 mt-0.5">Analisis ketercapaian KKM dan evaluasi berkala per rombongan belajar SMA Binaul Ummah.</p>
             </div>
-            <h1 class="mt-1 text-2xl font-bold text-slate-900 tracking-tight">Data Capaian Akademik Seluruh Siswa</h1>
-            <p class="text-xs text-slate-500 mt-0.5">Analisis ketercapaian KKM dan evaluasi berkala per rombongan belajar SMA Binaul Ummah.</p>
+            <div>
+                <a href="{{ route('reports.create') }}" class="btn-indigo text-xs">
+                    <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    + Input Nilai Akademik Siswa
+                </a>
+            </div>
         </div>
     </x-slot>
 
     <div class="space-y-6">
+        <!-- Filter bar -->
+        <div class="panel p-4">
+            <form method="GET" action="{{ route('reports.index') }}" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                    <label class="label-modern">Cari Nama / NIS</label>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Ketik nama atau NIS siswa..." class="input-modern">
+                </div>
+                <div>
+                    <label class="label-modern">Filter Rombel Kelas</label>
+                    <select name="kelas" class="input-modern">
+                        <option value="">Semua Kelas</option>
+                        @foreach ($kelasList as $k)
+                            <option value="{{ $k }}" {{ request('kelas') === $k ? 'selected' : '' }}>{{ $k }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="flex items-end gap-2">
+                    <button type="submit" class="btn-primary w-full text-xs">Filter Nilai</button>
+                    <a href="{{ route('reports.index') }}" class="btn-light text-xs">Reset</a>
+                </div>
+            </form>
+        </div>
         <div class="panel overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="table-modern">

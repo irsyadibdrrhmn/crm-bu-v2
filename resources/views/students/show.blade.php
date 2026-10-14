@@ -51,9 +51,14 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Nilai Siswa -->
             <div class="panel p-6">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-700 pb-3 border-b border-slate-100">
-                    Nilai Akademik Semester Ganjil
-                </h3>
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-700">
+                        Nilai Akademik Semester Ganjil
+                    </h3>
+                    <a href="{{ route('reports.create', ['student_id' => $student->id]) }}" class="btn-indigo !py-1 !px-2.5 !text-xs">
+                        + Tambah Nilai
+                    </a>
+                </div>
                 <div class="overflow-x-auto mt-3">
                     <table class="table-modern">
                         <thead>
@@ -62,6 +67,7 @@
                                 <th>KKM</th>
                                 <th>Nilai Akhir</th>
                                 <th>Grade</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
@@ -71,6 +77,16 @@
                                     <td class="text-xs text-slate-500">{{ $r->kkm }}</td>
                                     <td class="text-xs font-bold {{ $r->nilai_akhir >= $r->kkm ? 'text-emerald-700' : 'text-rose-700 font-black' }}">{{ $r->nilai_akhir }}</td>
                                     <td><span class="badge {{ $r->grade === 'A' ? 'bg-emerald-100 text-emerald-800' : 'bg-sky-100 text-sky-800' }}">{{ $r->grade }}</span></td>
+                                    <td>
+                                        <div class="flex items-center gap-1.5">
+                                            <a href="{{ route('reports.edit', $r) }}" class="btn-light !py-0.5 !px-2 !text-[11px] font-semibold text-indigo-600">Edit</a>
+                                            <form method="POST" action="{{ route('reports.destroy', $r) }}" onsubmit="return confirm('Hapus nilai mata pelajaran ini?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-[11px] text-rose-600 hover:underline">Hapus</button>
+                                            </form>
+                                        </div>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>

@@ -1,17 +1,59 @@
 <x-app-layout>
     <x-slot name="header">
-        <div>
-            <div class="flex items-center gap-2">
-                <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Kedisiplinan & Kesiswaan</span>
-                <span class="text-xs text-slate-400">/</span>
-                <span class="text-xs font-medium text-slate-500">Log Presensi</span>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Kedisiplinan & Kesiswaan</span>
+                    <span class="text-xs text-slate-400">/</span>
+                    <span class="text-xs font-medium text-slate-500">Log Presensi</span>
+                </div>
+                <h1 class="mt-1 text-2xl font-bold text-slate-900 tracking-tight">Monitoring Presensi Seluruh Siswa</h1>
+                <p class="text-xs text-slate-500 mt-0.5">Audit log kedatangan harian gerbang sekolah SMA Binaul Ummah.</p>
             </div>
-            <h1 class="mt-1 text-2xl font-bold text-slate-900 tracking-tight">Monitoring Presensi Seluruh Siswa</h1>
-            <p class="text-xs text-slate-500 mt-0.5">Audit log kedatangan harian gerbang sekolah SMA Binaul Ummah.</p>
+            <div>
+                <a href="{{ route('attendance.create') }}" class="btn-indigo text-xs">
+                    <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                    + Input Presensi Harian Kelas
+                </a>
+            </div>
         </div>
     </x-slot>
 
-    <div class="panel overflow-hidden">
+    <div class="space-y-6">
+        <!-- Filter Bar -->
+        <div class="panel p-4">
+            <form method="GET" action="{{ route('attendance.index') }}" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <div>
+                    <label class="label-modern">Tanggal</label>
+                    <input type="date" name="tanggal" value="{{ request('tanggal') }}" class="input-modern">
+                </div>
+                <div>
+                    <label class="label-modern">Filter Rombel Kelas</label>
+                    <select name="kelas" class="input-modern">
+                        <option value="">Semua Rombel</option>
+                        @foreach ($kelasList as $k)
+                            <option value="{{ $k }}" {{ request('kelas') === $k ? 'selected' : '' }}>{{ $k }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="label-modern">Status Kehadiran</label>
+                    <select name="status" class="input-modern">
+                        <option value="">Semua Status</option>
+                        <option value="hadir" {{ request('status') === 'hadir' ? 'selected' : '' }}>Hadir</option>
+                        <option value="sakit" {{ request('status') === 'sakit' ? 'selected' : '' }}>Sakit</option>
+                        <option value="izin" {{ request('status') === 'izin' ? 'selected' : '' }}>Izin</option>
+                        <option value="alpha" {{ request('status') === 'alpha' ? 'selected' : '' }}>Alpha</option>
+                    </select>
+                </div>
+                <div class="flex items-end gap-2">
+                    <button type="submit" class="btn-primary w-full text-xs">Filter</button>
+                    <a href="{{ route('attendance.index') }}" class="btn-light text-xs">Reset</a>
+                </div>
+            </form>
+        </div>
         <div class="overflow-x-auto">
             <table class="table-modern">
                 <thead>
@@ -54,6 +96,7 @@
         <div class="p-4 border-t border-slate-100">
             {{ $attendances->links() }}
         </div>
+    </div>
     </div>
 </x-app-layout>
 

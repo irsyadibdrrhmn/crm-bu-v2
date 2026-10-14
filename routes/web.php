@@ -38,7 +38,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/students', [StudentController::class, 'index'])->name('students.index');
         Route::get('/students/{student}', [StudentController::class, 'show'])->name('students.show');
         Route::get('/communication-logs', [CommunicationLogController::class, 'index'])->name('communication-logs.index');
-        Route::resource('pengumuman', PengumumanController::class);
+        Route::resource('pengumuman', \App\Http\Controllers\PengumumanController::class);
+
+        // Manajemen Rapor & Nilai Siswa
+        Route::get('/reports/create', [AcademicReportController::class, 'create'])->name('reports.create');
+        Route::post('/reports', [AcademicReportController::class, 'store'])->name('reports.store');
+        Route::get('/reports/{report}/edit', [AcademicReportController::class, 'edit'])->name('reports.edit');
+        Route::put('/reports/{report}', [AcademicReportController::class, 'update'])->name('reports.update');
+        Route::delete('/reports/{report}', [AcademicReportController::class, 'destroy'])->name('reports.destroy');
+
+        // Input Presensi Harian Kelas
+        Route::get('/attendance/create', [AttendanceController::class, 'create'])->name('attendance.create');
+        Route::post('/attendance', [AttendanceController::class, 'store'])->name('attendance.store');
 
         // Manajemen Akun Pengguna (Siswa & Orang Tua)
         Route::resource('admin/users', \App\Http\Controllers\UserAccountController::class)
