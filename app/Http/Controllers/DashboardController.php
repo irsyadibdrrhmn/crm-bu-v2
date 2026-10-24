@@ -15,8 +15,8 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        // 1. DASHBOARD ANALYTICAL & OLAP UNTUK ADMIN / MANAGEMENT
-        if ($user->isAdmin()) {
+        // 1. DASHBOARD ANALYTICAL & OLAP UNTUK ADMIN & STAF PENDIDIK (GURU & BK)
+        if ($user->isStaff()) {
             // Total & Status Tiket
             $totalTickets = ComplaintTicket::count();
             $openTickets = ComplaintTicket::where('status', 'menunggu')->count();
@@ -31,8 +31,13 @@ class DashboardController extends Controller
             $csatCount = ComplaintTicket::whereNotNull('rating_kepuasan')->count();
 
             // Rata-rata response & SLA resolution (dalam Jam)
+            $isMysql = DB::getDriverName() === 'mysql';
+            $hourDiffExpr = $isMysql
+                ? "TIMESTAMPDIFF(HOUR, created_at, resolved_at)"
+                : "((julianday(resolved_at) - julianday(created_at)) * 24)";
+
             $avgResolutionHours = ComplaintTicket::whereNotNull('resolved_at')
-                ->selectRaw('AVG(TIMESTAMPDIFF(HOUR, created_at, resolved_at)) as avg_hours')
+                ->selectRaw("AVG({$hourDiffExpr}) as avg_hours")
                 ->value('avg_hours') ?? 0;
 
             // OLAP Breakdown: Tiket berdasarkan Kategori

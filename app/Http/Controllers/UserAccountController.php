@@ -41,7 +41,9 @@ class UserAccountController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'role' => 'required|in:admin,parent,student',
+            'role' => 'required|in:admin,guru,bk,parent,student',
+            'nip' => 'nullable|string|max:30',
+            'jabatan' => 'nullable|string|max:100',
             'password' => 'required|string|min:8',
             'student_id' => 'nullable|exists:students,id',
             // Jika role adalah student dan ingin membuat profil siswa baru secara langsung
@@ -54,6 +56,8 @@ class UserAccountController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'nip' => $request->nip,
+            'jabatan' => $request->jabatan,
             'role' => $request->role,
             'password' => Hash::make($request->password),
         ]);
@@ -98,7 +102,9 @@ class UserAccountController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],
-            'role' => 'required|in:admin,parent,student',
+            'role' => 'required|in:admin,guru,bk,parent,student',
+            'nip' => 'nullable|string|max:30',
+            'jabatan' => 'nullable|string|max:100',
             'password' => 'nullable|string|min:8',
             'student_id' => 'nullable|exists:students,id',
         ]);
@@ -106,6 +112,8 @@ class UserAccountController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->role = $request->role;
+        $user->nip = $request->nip;
+        $user->jabatan = $request->jabatan;
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }

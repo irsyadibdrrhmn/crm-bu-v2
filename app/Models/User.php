@@ -13,7 +13,9 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'role', // admin, parent, student
+        'nip',
+        'jabatan',
+        'role', // admin, guru, bk, parent, student
         'password',
     ];
 
@@ -36,6 +38,21 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
+    public function isGuru(): bool
+    {
+        return $this->role === 'guru';
+    }
+
+    public function isBk(): bool
+    {
+        return $this->role === 'bk';
+    }
+
+    public function isStaff(): bool
+    {
+        return in_array($this->role, ['admin', 'guru', 'bk']);
+    }
+
     public function isParent(): bool
     {
         return $this->role === 'parent';
@@ -44,6 +61,18 @@ class User extends Authenticatable
     public function isStudent(): bool
     {
         return $this->role === 'student';
+    }
+
+    public function getRoleLabelAttribute(): string
+    {
+        return match ($this->role) {
+            'admin' => 'Administrator & Manajemen',
+            'guru' => 'Guru Mata Pelajaran / Wali Kelas',
+            'bk' => 'Guru Bimbingan Konseling (BP/BK)',
+            'parent' => 'Orang Tua / Wali Siswa',
+            'student' => 'Siswa Aktif',
+            default => ucfirst($this->role),
+        };
     }
 
     // Relasi profil siswa jika user adalah siswa

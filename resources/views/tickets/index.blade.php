@@ -22,10 +22,10 @@
     </x-slot>
 
     <div class="space-y-6">
-        @if (auth()->user()->isAdmin())
-            <!-- Filter Bar untuk Admin -->
+        @if (auth()->user()->isStaff())
+            <!-- Filter Bar Multidimensi untuk Staf (Admin, Guru, BK) -->
             <div class="panel p-4">
-                <form method="GET" action="{{ route('tickets.index') }}" class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
+                <form method="GET" action="{{ route('tickets.index') }}" class="grid grid-cols-1 sm:grid-cols-5 gap-3 items-end">
                     <div>
                         <label class="label-modern">Status Tiket</label>
                         <select name="status" class="input-modern">
@@ -44,6 +44,7 @@
                             <option value="fasilitas" {{ request('kategori') === 'fasilitas' ? 'selected' : '' }}>Fasilitas</option>
                             <option value="keuangan" {{ request('kategori') === 'keuangan' ? 'selected' : '' }}>Keuangan</option>
                             <option value="layanan_konseling" {{ request('kategori') === 'layanan_konseling' ? 'selected' : '' }}>Layanan Konseling</option>
+                            <option value="kedisiplinan" {{ request('kategori') === 'kedisiplinan' ? 'selected' : '' }}>Kedisiplinan</option>
                             <option value="administrasi" {{ request('kategori') === 'administrasi' ? 'selected' : '' }}>Administrasi</option>
                             <option value="ekstrakurikuler" {{ request('kategori') === 'ekstrakurikuler' ? 'selected' : '' }}>Ekstrakurikuler</option>
                         </select>
@@ -56,6 +57,16 @@
                             <option value="sedang" {{ request('urgensi') === 'sedang' ? 'selected' : '' }}>Sedang</option>
                             <option value="tinggi" {{ request('urgensi') === 'tinggi' ? 'selected' : '' }}>Tinggi</option>
                             <option value="darurat" {{ request('urgensi') === 'darurat' ? 'selected' : '' }}>Darurat</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="label-modern">Dimensi Pelapor</label>
+                        <select name="pelapor_role" class="input-modern">
+                            <option value="">Semua Stakeholder</option>
+                            <option value="guru" {{ request('pelapor_role') === 'guru' ? 'selected' : '' }}>Guru / Wali Kelas</option>
+                            <option value="bk" {{ request('pelapor_role') === 'bk' ? 'selected' : '' }}>Guru BP/BK</option>
+                            <option value="parent" {{ request('pelapor_role') === 'parent' ? 'selected' : '' }}>Orang Tua</option>
+                            <option value="student" {{ request('pelapor_role') === 'student' ? 'selected' : '' }}>Siswa</option>
                         </select>
                     </div>
                     <div class="flex gap-2">
@@ -72,10 +83,10 @@
                     <thead>
                         <tr>
                             <th>No. Tiket</th>
-                            <th>Pelapor</th>
+                            <th>Pelapor (Stakeholder)</th>
                             <th>Siswa Terkait</th>
                             <th>Kategori & Judul</th>
-                            <th>Urgensi</th>
+                            <th>Urgensi / Prioritas</th>
                             <th>Status</th>
                             <th>Tanggal Masuk</th>
                             <th>Aksi</th>
@@ -89,7 +100,26 @@
                                 </td>
                                 <td>
                                     <div class="text-xs font-medium text-slate-900">{{ $ticket->user->name }}</div>
-                                    <div class="text-[11px] text-slate-400 capitalize">{{ $ticket->user->role }}</div>
+                                    @php
+                                        $rolePelapor = $ticket->pelapor_role ?? $ticket->user->role;
+                                        $roleBadge = match($rolePelapor) {
+                                            'guru' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                                            'bk' => 'bg-purple-50 text-purple-700 border-purple-200',
+                                            'parent' => 'bg-sky-50 text-sky-700 border-sky-200',
+                                            'student' => 'bg-amber-50 text-amber-700 border-amber-200',
+                                            default => 'bg-slate-50 text-slate-700 border-slate-200'
+                                        };
+                                        $roleText = match($rolePelapor) {
+                                            'guru' => 'Guru / Wali',
+                                            'bk' => 'Guru BP/BK',
+                                            'parent' => 'Orang Tua',
+                                            'student' => 'Siswa',
+                                            default => ucfirst($rolePelapor)
+                                        };
+                                    @endphp
+                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold border {{ $roleBadge }} mt-0.5">
+                                        {{ $roleText }}
+                                    </span>
                                 </td>
                                 <td>
                                     <div class="text-xs text-slate-700">
@@ -109,7 +139,26 @@
                                     <span class="badge badge-urgensi-{{ $ticket->urgensi }}">
                                         {{ strtoupper($ticket->urgensi) }}
                                     </span>
+                                    @if ($ticket->skor_prioritas)
+                                        <div class="text-[10px] text-indigo-600 font-semibold mt-1">
+                                            Skor: {{ number_format($ticket->skor_prioritas, 0) }}
+                                        </div>
+                                    @endif
                                 </td>
+                                <td>
+                                    <span class="badge badge-{{ $ticket->status }}">
+                                        {{ ucfirst($ticket->status) }}
+                                    </span>
+                                </td>
+                                <td class="text-xs text-slate-500">
+                                    {{ $ticket->created_at->format('d/m/Y H:i') }}
+                                </td>
+                                <td>
+                                    <a href="{{ route('tickets.show', $ticket) }}" class="btn-light !py-1 !px-2.5 !text-xs font-semibold hover:text-indigo-600">
+                                        Detail
+                                    </a>
+                                </td>
+                            </tr>
                                 <td>
                                     <span class="badge badge-{{ $ticket->status }}">
                                         {{ ucfirst($ticket->status) }}

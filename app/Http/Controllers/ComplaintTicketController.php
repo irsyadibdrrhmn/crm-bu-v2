@@ -16,10 +16,10 @@ class ComplaintTicketController extends Controller
         $query = ComplaintTicket::with(['user', 'student', 'assignedStaff'])->latest();
 
         // Filter berdasarkan peran
-        if (!$user->isAdmin()) {
+        if (!$user->isStaff()) {
             $query->where('user_id', $user->id);
         } else {
-            // Filter tambahan untuk Admin
+            // Filter tambahan untuk Staf (Admin, Guru, BK)
             if ($request->filled('status')) {
                 $query->where('status', $request->status);
             }
@@ -28,6 +28,9 @@ class ComplaintTicketController extends Controller
             }
             if ($request->filled('kategori')) {
                 $query->where('kategori', $request->kategori);
+            }
+            if ($request->filled('pelapor_role')) {
+                $query->where('pelapor_role', $request->pelapor_role);
             }
         }
 
@@ -41,12 +44,12 @@ class ComplaintTicketController extends Controller
         $user = auth()->user();
         $students = collect();
 
-        if ($user->isParent()) {
+        if ($user->isStaff()) {
+            $students = Student::orderBy('kelas')->orderBy('nama_lengkap')->get();
+        } elseif ($user->isParent()) {
             $students = $user->children;
         } elseif ($user->isStudent() && $user->studentProfile) {
             $students = collect([$user->studentProfile]);
-        } elseif ($user->isAdmin()) {
-            $students = Student::orderBy('nama_lengkap')->get();
         }
 
         $selectedStudentId = $request->query('student_id');
@@ -61,9 +64,45 @@ class ComplaintTicketController extends Controller
             'kategori' => 'required|in:akademik,fasilitas,keuangan,kedisiplinan,layanan_konseling,administrasi,ekstrakurikuler',
             'urgensi' => 'required|in:rendah,sedang,tinggi,darurat',
             'deskripsi' => 'required|string',
+            'faktor_penyebab' => 'nullable|string',
+            'tindakan_solusi' => 'nullable|string',
             'student_id' => 'nullable|exists:students,id',
             'lampiran' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:4096',
         ]);
+
+        $user = auth()->user();
+
+        // Kalkulasi Analitik SLA Target Hours & Skor Prioritas (Analytical CRM Model)
+        $slaTarget = match ($request->urgensi) {
+            'darurat' => 12,
+            'tinggi' => 24,
+            'sedang' => 48,
+            'rendah' => 72,
+            default => 48,
+        };
+
+        $bobotUrgensi = match ($request->urgensi) {
+            'darurat' => 40,
+            'tinggi' => 30,
+            'sedang' => 20,
+            'rendah' => 10,
+            default => 20,
+        };
+
+        $bobotKategori = match ($request->kategori) {
+            'layanan_konseling', 'kedisiplinan' => 30,
+            'fasilitas', 'akademik' => 25,
+            default => 15,
+        };
+
+        $bobotPelapor = match ($user->role) {
+            'guru', 'bk' => 30,
+            'parent' => 25,
+            'student' => 20,
+            default => 25,
+        };
+
+        $skorPrioritas = min(100.00, (float) ($bobotUrgensi + $bobotKategori + $bobotPelapor));
 
         $lampiranPath = null;
         if ($request->hasFile('lampiran')) {
@@ -90,25 +129,30 @@ class ComplaintTicketController extends Controller
 
         $ticket = ComplaintTicket::create([
             'ticket_number' => $ticketNumber,
-            'user_id' => auth()->id(),
+            'user_id' => $user->id,
+            'pelapor_role' => $user->role,
             'student_id' => $request->student_id,
             'kategori' => $request->kategori,
             'urgensi' => $request->urgensi,
+            'sla_target_hours' => $slaTarget,
+            'skor_prioritas' => $skorPrioritas,
             'status' => 'menunggu',
             'judul' => $request->judul,
             'deskripsi' => $request->deskripsi,
+            'faktor_penyebab' => $request->faktor_penyebab,
+            'tindakan_solusi' => $request->tindakan_solusi,
             'lampiran' => $lampiranPath,
         ]);
 
-        return redirect()->route('tickets.show', $ticket)->with('success', "Tiket {$ticketNumber} berhasil diajukan.");
+        return redirect()->route('tickets.show', $ticket)->with('success', "Tiket {$ticketNumber} berhasil diajukan dengan skor prioritas analitik: {$skorPrioritas}.");
     }
 
     public function show(ComplaintTicket $ticket)
     {
         $user = auth()->user();
 
-        // Otorisasi sederhana: Admin atau pemilik tiket
-        if (!$user->isAdmin() && $ticket->user_id !== $user->id) {
+        // Otorisasi: Staf (Admin, Guru, BK) atau pemilik tiket
+        if (!$user->isStaff() && $ticket->user_id !== $user->id) {
             abort(403, 'Anda tidak berhak melihat tiket ini.');
         }
 
@@ -121,13 +165,15 @@ class ComplaintTicketController extends Controller
     {
         $user = auth()->user();
 
-        if (!$user->isAdmin() && $ticket->user_id !== $user->id) {
+        if (!$user->isStaff() && $ticket->user_id !== $user->id) {
             abort(403);
         }
 
         $request->validate([
             'pesan' => 'required|string',
             'status' => 'nullable|in:menunggu,diproses,selesai,ditolak',
+            'faktor_penyebab' => 'nullable|string',
+            'tindakan_solusi' => 'nullable|string',
             'lampiran' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:4096',
         ]);
 
@@ -144,8 +190,8 @@ class ComplaintTicketController extends Controller
             'is_internal_note' => $request->boolean('is_internal_note', false),
         ]);
 
-        // Perbarui SLA tracking jika admin merespon
-        if ($user->isAdmin()) {
+        // Perbarui SLA tracking & analitik penyelesaian jika staf (Admin / Guru / BK) merespon
+        if ($user->isStaff()) {
             if (!$ticket->first_responded_at) {
                 $ticket->first_responded_at = Carbon::now();
             }
@@ -154,6 +200,12 @@ class ComplaintTicketController extends Controller
                 if ($request->status === 'selesai' && !$ticket->resolved_at) {
                     $ticket->resolved_at = Carbon::now();
                 }
+            }
+            if ($request->filled('faktor_penyebab')) {
+                $ticket->faktor_penyebab = $request->faktor_penyebab;
+            }
+            if ($request->filled('tindakan_solusi')) {
+                $ticket->tindakan_solusi = $request->tindakan_solusi;
             }
             if (!$ticket->assigned_to) {
                 $ticket->assigned_to = $user->id;

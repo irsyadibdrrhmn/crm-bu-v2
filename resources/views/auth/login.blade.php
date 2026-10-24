@@ -97,7 +97,34 @@
                 </button>
             </form>
 
-            <div class="mt-6 pt-6 border-t border-slate-100 text-center">
+            <div class="mt-6 pt-5 border-t border-slate-100">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-2">Akun Uji Coba Demo (Klik untuk Isi Cepat):</span>
+                <div class="flex flex-wrap gap-1.5" x-data="{
+                    fill(email) {
+                        document.getElementById('email').value = email;
+                        document.getElementById('password').value = 'password';
+                    }
+                }">
+                    <button type="button" @click="fill('admin@sma-binaulummah.sch.id')" class="text-[11px] px-2 py-1 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 rounded border border-slate-200 transition font-medium">
+                        🔑 Admin
+                    </button>
+                    <button type="button" @click="fill('guru@sma-binaulummah.sch.id')" class="text-[11px] px-2 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded border border-emerald-200 transition font-medium">
+                        👨‍🏫 Guru / Wali Kelas
+                    </button>
+                    <button type="button" @click="fill('bk@sma-binaulummah.sch.id')" class="text-[11px] px-2 py-1 bg-purple-50 hover:bg-purple-100 text-purple-800 rounded border border-purple-200 transition font-medium">
+                        🧠 Guru BP/BK
+                    </button>
+                    <button type="button" @click="fill('bambang.wali@gmail.com')" class="text-[11px] px-2 py-1 bg-sky-50 hover:bg-sky-100 text-sky-800 rounded border border-sky-200 transition font-medium">
+                        👨‍👩‍👦 Orang Tua
+                    </button>
+                    <button type="button" @click="fill('raditya.arya@siswa.sma-binaulummah.sch.id')" class="text-[11px] px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded border border-amber-200 transition font-medium">
+                        🎓 Siswa
+                    </button>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1.5">Kata sandi default semua akun demo: <code class="font-mono bg-slate-100 px-1 rounded">password</code></p>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-slate-100 text-center">
                 <p class="text-xs text-slate-500">
                     Belum memiliki akun wali atau siswa?
                     <a href="{{ route('register') }}" class="font-semibold text-indigo-600 hover:text-indigo-800 hover:underline">

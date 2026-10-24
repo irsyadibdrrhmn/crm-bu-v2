@@ -25,9 +25,26 @@
                     <select name="role" x-model="selectedRole" class="input-modern" required>
                         <option value="parent">Orang Tua / Wali Murid</option>
                         <option value="student">Siswa Aktif</option>
+                        <option value="guru">Guru Mata Pelajaran / Wali Kelas</option>
+                        <option value="bk">Guru Bimbingan Konseling (BP/BK)</option>
                         <option value="admin">Administrator / Manajemen Sekolah</option>
                     </select>
+                    <p class="text-[11px] text-slate-500 mt-1">Guru dan Guru BP/BK dapat menginput aduan/kasus siswa, mencatat bimbingan konseling, serta mengelola nilai & presensi.</p>
                     <x-input-error :messages="$errors->get('role')" class="mt-1" />
+                </div>
+
+                <!-- Kolom Tambahan Khusus Guru / Tenaga Pendidik / BP/BK -->
+                <div x-show="selectedRole === 'guru' || selectedRole === 'bk' || selectedRole === 'admin'" class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl bg-indigo-50/50 border border-indigo-100">
+                    <div>
+                        <label class="label-modern">NIP / NUPTK (Opsional)</label>
+                        <input type="text" name="nip" value="{{ old('nip') }}" placeholder="19840215..." class="input-modern">
+                        <x-input-error :messages="$errors->get('nip')" class="mt-1" />
+                    </div>
+                    <div>
+                        <label class="label-modern">Jabatan / Tugas</label>
+                        <input type="text" name="jabatan" value="{{ old('jabatan') }}" placeholder="Contoh: Wali Kelas XI-MIPA-1 atau Koordinator BK" class="input-modern">
+                        <x-input-error :messages="$errors->get('jabatan')" class="mt-1" />
+                    </div>
                 </div>
 
                 <!-- Nama Lengkap -->

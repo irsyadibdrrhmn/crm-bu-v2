@@ -34,6 +34,8 @@
                     <select name="role" class="input-modern">
                         <option value="">Semua Peran</option>
                         <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin & Manajemen</option>
+                        <option value="guru" {{ request('role') === 'guru' ? 'selected' : '' }}>Guru Mata Pelajaran / Wali Kelas</option>
+                        <option value="bk" {{ request('role') === 'bk' ? 'selected' : '' }}>Guru BP/BK (Konselor)</option>
                         <option value="parent" {{ request('role') === 'parent' ? 'selected' : '' }}>Orang Tua / Wali</option>
                         <option value="student" {{ request('role') === 'student' ? 'selected' : '' }}>Siswa</option>
                     </select>
@@ -70,12 +72,33 @@
                                 </td>
                                 <td class="font-mono text-xs text-slate-600">{{ $u->email }}</td>
                                 <td>
-                                    <span class="badge {{ $u->role === 'admin' ? 'bg-indigo-100 text-indigo-800' : ($u->role === 'parent' ? 'bg-sky-100 text-sky-800' : 'bg-emerald-100 text-emerald-800') }}">
-                                        {{ $u->role === 'admin' ? 'Manajemen Sekolah' : ($u->role === 'parent' ? 'Orang Tua / Wali' : 'Siswa Aktif') }}
+                                    @php
+                                        $badgeClasses = match($u->role) {
+                                            'admin' => 'bg-indigo-100 text-indigo-800 border border-indigo-200',
+                                            'guru' => 'bg-emerald-100 text-emerald-800 border border-emerald-200',
+                                            'bk' => 'bg-purple-100 text-purple-800 border border-purple-200',
+                                            'parent' => 'bg-sky-100 text-sky-800 border border-sky-200',
+                                            'student' => 'bg-amber-100 text-amber-800 border border-amber-200',
+                                            default => 'bg-slate-100 text-slate-800'
+                                        };
+                                        $roleName = match($u->role) {
+                                            'admin' => 'Manajemen Sekolah',
+                                            'guru' => 'Guru / Wali Kelas',
+                                            'bk' => 'Guru BP / BK',
+                                            'parent' => 'Orang Tua / Wali',
+                                            'student' => 'Siswa Aktif',
+                                            default => ucfirst($u->role)
+                                        };
+                                    @endphp
+                                    <span class="badge {{ $badgeClasses }}">
+                                        {{ $roleName }}
                                     </span>
                                 </td>
                                 <td>
-                                    @if ($u->role === 'parent')
+                                    @if ($u->role === 'guru' || $u->role === 'bk')
+                                        <div class="text-xs text-slate-800 font-semibold">{{ $u->jabatan ?? ($u->role === 'bk' ? 'Guru Konseling BP/BK' : 'Guru Pengampu') }}</div>
+                                        <span class="text-[10px] text-slate-400 font-mono">{{ $u->nip ? 'NIP: ' . $u->nip : 'Pendidik Terdaftar' }}</span>
+                                    @elseif ($u->role === 'parent')
                                         @if ($u->children->count())
                                             <div class="text-xs text-slate-800 font-semibold">
                                                 {{ $u->children->pluck('nama_lengkap')->join(', ') }}

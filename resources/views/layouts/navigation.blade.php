@@ -3,13 +3,24 @@
     
     if ($user?->isAdmin()) {
         $navItems = [
-            ['label' => 'Analytical Dashboard', 'route' => 'dashboard', 'active' => 'dashboard', 'icon' => 'chart'],
+            ['label' => 'Executive Dashboard', 'route' => 'dashboard', 'active' => 'dashboard', 'icon' => 'chart'],
+            ['label' => 'OLAP Analytical CRM', 'route' => 'analytics.olap', 'active' => 'analytics.*', 'icon' => 'cube'],
             ['label' => 'Tiket Layanan & Aduan', 'route' => 'tickets.index', 'active' => 'tickets.*', 'icon' => 'ticket'],
             ['label' => 'Data & Performa Siswa', 'route' => 'students.index', 'active' => 'students.*', 'icon' => 'academic'],
             ['label' => 'Presensi Siswa', 'route' => 'attendance.index', 'active' => 'attendance.*', 'icon' => 'calendar'],
             ['label' => 'Manajemen Akun', 'route' => 'admin.users.index', 'active' => 'admin.users.*', 'icon' => 'user-group'],
             ['label' => 'Log Komunikasi / Email', 'route' => 'communication-logs.index', 'active' => 'communication-logs.*', 'icon' => 'mail'],
             ['label' => 'Pengumuman Sekolah', 'route' => 'pengumuman.index', 'active' => 'pengumuman.*', 'icon' => 'megaphone'],
+        ];
+    } elseif ($user?->isGuru() || $user?->isBk()) {
+        $navItems = [
+            ['label' => 'Dashboard Pendidik', 'route' => 'dashboard', 'active' => 'dashboard', 'icon' => 'chart'],
+            ['label' => 'OLAP Analytical CRM', 'route' => 'analytics.olap', 'active' => 'analytics.*', 'icon' => 'cube'],
+            ['label' => 'Tiket Permasalahan & Aduan', 'route' => 'tickets.index', 'active' => 'tickets.index', 'icon' => 'ticket'],
+            ['label' => 'Input Kasus / Aduan Baru', 'route' => 'tickets.create', 'active' => 'tickets.create', 'icon' => 'ticket'],
+            ['label' => 'Data & Profil Siswa', 'route' => 'students.index', 'active' => 'students.*', 'icon' => 'user-group'],
+            ['label' => 'Evaluasi Belajar & Nilai', 'route' => 'reports.index', 'active' => 'reports.*', 'icon' => 'academic'],
+            ['label' => 'Presensi Harian Siswa', 'route' => 'attendance.index', 'active' => 'attendance.*', 'icon' => 'calendar'],
         ];
     } elseif ($user?->isParent()) {
         $navItems = [
@@ -30,6 +41,7 @@
     $renderIcon = function ($icon) {
         $paths = [
             'chart' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />',
+            'cube' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />',
             'ticket' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />',
             'academic' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" />',
             'calendar' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />',
@@ -80,8 +92,8 @@
                 </div>
                 <div class="overflow-hidden">
                     <p class="text-xs font-semibold text-white truncate">{{ $user->name ?? 'User' }}</p>
-                    <p class="text-[11px] text-slate-400 capitalize">
-                        Role: {{ $user->role === 'parent' ? 'Orang Tua' : ($user->role === 'student' ? 'Siswa' : 'Admin & Manajemen') }}
+                    <p class="text-[11px] text-slate-400 truncate">
+                        {{ $user->role_label }}
                     </p>
                 </div>
             </div>

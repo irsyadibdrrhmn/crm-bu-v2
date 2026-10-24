@@ -33,12 +33,14 @@ Route::middleware('auth')->group(function () {
     // 4. Attendances / Presensi Real-Time
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
 
-    // 5. Khusus Admin / Manajemen Sekolah
-    Route::middleware('role:admin')->group(function () {
+    // 5. Fitur Analitik & Staf Pendidik (Admin, Guru, BK)
+    Route::middleware('role:admin,guru,bk')->group(function () {
+        // Engine Pemrosesan Analitis Multidimensi (OLAP & Analytical CRM)
+        Route::get('/analytics/olap', [\App\Http\Controllers\OlapAnalyticsController::class, 'index'])->name('analytics.olap');
+
+        // Data & Performa Siswa
         Route::get('/students', [StudentController::class, 'index'])->name('students.index');
         Route::get('/students/{student}', [StudentController::class, 'show'])->name('students.show');
-        Route::get('/communication-logs', [CommunicationLogController::class, 'index'])->name('communication-logs.index');
-        Route::resource('pengumuman', \App\Http\Controllers\PengumumanController::class);
 
         // Manajemen Rapor & Nilai Siswa
         Route::get('/reports/create', [AcademicReportController::class, 'create'])->name('reports.create');
@@ -50,8 +52,14 @@ Route::middleware('auth')->group(function () {
         // Input Presensi Harian Kelas
         Route::get('/attendance/create', [AttendanceController::class, 'create'])->name('attendance.create');
         Route::post('/attendance', [AttendanceController::class, 'store'])->name('attendance.store');
+    });
 
-        // Manajemen Akun Pengguna (Siswa & Orang Tua)
+    // 6. Khusus Administrator (Manajemen Akun & Log Komunikasi)
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/communication-logs', [CommunicationLogController::class, 'index'])->name('communication-logs.index');
+        Route::resource('pengumuman', \App\Http\Controllers\PengumumanController::class);
+
+        // Manajemen Akun Pengguna (Admin, Guru, BK, Ortu, Siswa)
         Route::resource('admin/users', \App\Http\Controllers\UserAccountController::class)
             ->names('admin.users');
     });

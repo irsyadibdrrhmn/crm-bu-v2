@@ -1,13 +1,23 @@
 <x-app-layout>
     <x-slot name="header">
-        <div>
-            <div class="flex items-center gap-2">
-                <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Manajemen & Mutu Sekolah</span>
-                <span class="text-xs text-slate-400">/</span>
-                <span class="text-xs font-medium text-slate-500">OLAP Analytical Engine</span>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Analytical CRM</span>
+                    <span class="text-xs text-slate-400">/</span>
+                    <span class="text-xs font-medium text-slate-500">OLAP Analytical Engine</span>
+                </div>
+                <h1 class="mt-1 text-2xl font-bold text-slate-900 tracking-tight">Executive CRM & Service Analytics</h1>
+                <p class="text-xs text-slate-500 mt-0.5">Monitoring SLA penanganan keluhan, indeks kepuasan stakeholders, dan indikator risiko akademik siswa SMA Binaul Ummah.</p>
             </div>
-            <h1 class="mt-1 text-2xl font-bold text-slate-900 tracking-tight">Executive CRM & Service Analytics</h1>
-            <p class="text-xs text-slate-500 mt-0.5">Monitoring SLA penanganan keluhan, indeks kepuasan orang tua, dan indikator risiko akademik siswa SMA Binaul Ummah.</p>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('analytics.olap') }}" class="btn-indigo text-xs flex items-center gap-1.5 shadow-sm">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                    Buka Pemrosesan OLAP Multidimensi →
+                </a>
+            </div>
         </div>
     </x-slot>
 

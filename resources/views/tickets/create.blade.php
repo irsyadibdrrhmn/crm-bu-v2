@@ -133,9 +133,30 @@
                 <!-- Deskripsi Rinci -->
                 <div>
                     <label class="label-modern">Deskripsi Lengkap & Detail Masalah <span class="text-rose-500">*</span></label>
-                    <textarea name="deskripsi" rows="5" class="input-modern" placeholder="Tuliskan secara lengkap lokasi, waktu kejadian, dan permohonan solusi yang diharapkan..." required>{{ old('deskripsi') }}</textarea>
+                    <textarea name="deskripsi" rows="4" class="input-modern" placeholder="Tuliskan secara lengkap lokasi, waktu kejadian, dan permohonan solusi yang diharapkan..." required>{{ old('deskripsi') }}</textarea>
                     <x-input-error :messages="$errors->get('deskripsi')" class="mt-1" />
                 </div>
+
+                @if (auth()->user()->isStaff())
+                    <!-- Analisis Awal Pendidik / BP/BK (OLAP Analytical CRM Input) -->
+                    <div class="p-4 rounded-xl bg-indigo-50/60 border border-indigo-200/80 space-y-3">
+                        <div class="flex items-center gap-2">
+                            <span class="h-2 w-2 rounded-full bg-indigo-600"></span>
+                            <h4 class="text-xs font-bold text-indigo-950 uppercase tracking-wide">Analisis Awal Pendidik / BP/BK (Analytical CRM)</h4>
+                        </div>
+                        <p class="text-[11px] text-indigo-800">Sebagai pendidik/konselor, Anda dapat menyertakan diagnosa awal faktor penyebab dan rekomendasi penanganan.</p>
+                        
+                        <div>
+                            <label class="label-modern">Indikasi Faktor Penyebab (Akar Masalah)</label>
+                            <input type="text" name="faktor_penyebab" value="{{ old('faktor_penyebab') }}" placeholder="Contoh: Kendala waktu tidur, kesulitan konsep dasar, masalah adaptasi sosial..." class="input-modern">
+                        </div>
+
+                        <div>
+                            <label class="label-modern">Usulan Rencana Solusi / Tindakan Awal</label>
+                            <input type="text" name="tindakan_solusi" value="{{ old('tindakan_solusi') }}" placeholder="Contoh: Konseling individu berkala, remedial terbimbing, koordinasi wali murid..." class="input-modern">
+                        </div>
+                    </div>
+                @endif
 
                 <!-- Lampiran Dokumen / Foto -->
                 <div>
