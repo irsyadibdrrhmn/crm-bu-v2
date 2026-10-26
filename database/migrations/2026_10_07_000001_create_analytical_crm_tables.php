@@ -29,7 +29,8 @@ return new class extends Migration
         Schema::create('complaint_tickets', function (Blueprint $table) {
             $table->id();
             $table->string('ticket_number', 30)->unique(); // e.g. TKT-202610-001
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete(); // Pelapor (student / parent)
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete(); // Pelapor (student / parent / guru / bk)
+            $table->string('pelapor_role', 20)->default('parent');
             $table->foreignId('student_id')->nullable()->constrained('students')->nullOnDelete();
             $table->enum('kategori', [
                 'akademik',
@@ -41,9 +42,13 @@ return new class extends Migration
                 'ekstrakurikuler'
             ])->default('akademik');
             $table->enum('urgensi', ['rendah', 'sedang', 'tinggi', 'darurat'])->default('sedang');
+            $table->unsignedInteger('sla_target_hours')->default(48);
             $table->enum('status', ['menunggu', 'diproses', 'selesai', 'ditolak'])->default('menunggu');
+            $table->decimal('skor_prioritas', 5, 2)->nullable();
             $table->string('judul');
             $table->text('deskripsi');
+            $table->text('faktor_penyebab')->nullable();
+            $table->text('tindakan_solusi')->nullable();
             $table->string('lampiran')->nullable();
             $table->unsignedTinyInteger('rating_kepuasan')->nullable(); // 1 - 5 (CSAT)
             $table->text('ulasan_kepuasan')->nullable();

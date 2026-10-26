@@ -15,17 +15,31 @@ return new class extends Migration
         }
 
         Schema::table('users', function (Blueprint $table) {
-            $table->string('nip', 30)->nullable()->after('email');
-            $table->string('jabatan', 100)->nullable()->after('nip'); // e.g. Guru BK, Wali Kelas X-MIPA-1
+            if (!Schema::hasColumn('users', 'nip')) {
+                $table->string('nip', 30)->nullable()->after('email');
+            }
+            if (!Schema::hasColumn('users', 'jabatan')) {
+                $table->string('jabatan', 100)->nullable()->after('nip');
+            }
         });
 
         // 2. Tambah field OLAP & analitik penyelesaian masalah pada tiket
         Schema::table('complaint_tickets', function (Blueprint $table) {
-            $table->string('pelapor_role', 20)->default('parent')->after('user_id'); // parent, student, guru, bk, admin
-            $table->unsignedInteger('sla_target_hours')->default(48)->after('urgensi'); // SLA target jam
-            $table->text('faktor_penyebab')->nullable()->after('deskripsi'); // Analitik: Akar / faktor penyebab masalah
-            $table->text('tindakan_solusi')->nullable()->after('faktor_penyebab'); // Metode penyelesaian: Tindakan perbaikan yang diambil
-            $table->decimal('skor_prioritas', 5, 2)->nullable()->after('status'); // Skor prioritas hasil kalkulasi analitik
+            if (!Schema::hasColumn('complaint_tickets', 'pelapor_role')) {
+                $table->string('pelapor_role', 20)->default('parent')->after('user_id');
+            }
+            if (!Schema::hasColumn('complaint_tickets', 'sla_target_hours')) {
+                $table->unsignedInteger('sla_target_hours')->default(48)->after('urgensi');
+            }
+            if (!Schema::hasColumn('complaint_tickets', 'faktor_penyebab')) {
+                $table->text('faktor_penyebab')->nullable()->after('deskripsi');
+            }
+            if (!Schema::hasColumn('complaint_tickets', 'tindakan_solusi')) {
+                $table->text('tindakan_solusi')->nullable()->after('faktor_penyebab');
+            }
+            if (!Schema::hasColumn('complaint_tickets', 'skor_prioritas')) {
+                $table->decimal('skor_prioritas', 5, 2)->nullable()->after('status');
+            }
         });
     }
 
