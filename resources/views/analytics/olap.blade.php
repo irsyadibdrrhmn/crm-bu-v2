@@ -23,30 +23,32 @@
 
     <div class="space-y-6">
         <!-- 0. REAL-TIME DATA STATUS & TICKET BAROMETER -->
-        <div class="panel p-5 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shadow-xl border border-indigo-900/50">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-4 border-b border-indigo-800/40">
+        <div class="panel p-5 border-l-4 border-l-indigo-600 bg-white shadow-sm">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-4 border-b border-slate-100">
                 <div class="flex items-center gap-3">
-                    <span class="relative flex h-3.5 w-3.5">
+                    <span class="relative flex h-3 w-3">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
                     </span>
                     <div>
                         <div class="flex items-center gap-2">
-                            <h2 class="text-sm font-extrabold uppercase tracking-widest text-emerald-400">Sinkronisasi Database Real-Time Aktif</h2>
-                            <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-mono font-bold">LIVE OLAP</span>
+                            <h2 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider">Barometer Status Tiket & Kinerja Layanan</h2>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                Live Database Sync
+                            </span>
                         </div>
-                        <p class="text-xs text-slate-300 mt-0.5">
-                            Setiap penambahan atau pembaruan tiket aduan dari <strong>Siswa</strong>, <strong>Orang Tua</strong>, <strong>Guru</strong>, maupun <strong>BK</strong> langsung terakumulasi ke dalam kalkulasi matriks analitik detik ini.
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            Setiap tiket aduan baru dari <strong>Siswa</strong>, <strong>Orang Tua</strong>, <strong>Guru</strong>, maupun <strong>BK</strong> langsung terakumulasi detik ini.
                         </p>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
                     <div class="text-right">
-                        <span class="text-[10px] text-slate-400 block uppercase tracking-wider font-semibold">Waktu Pembaruan Data:</span>
-                        <span class="text-xs font-mono font-bold text-slate-200">{{ $lastRefreshedAt }}</span>
+                        <span class="text-[10px] text-slate-400 block uppercase tracking-wider font-semibold">Pembaruan Terakhir:</span>
+                        <span class="text-xs font-mono font-bold text-slate-700">{{ $lastRefreshedAt }}</span>
                     </div>
-                    <button onclick="window.location.reload()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shadow">
-                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <button onclick="window.location.reload()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                        <svg class="h-3.5 w-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg>
                         Segarkan Data
@@ -56,39 +58,43 @@
 
             <!-- Barometer Grid Counter -->
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 pt-4">
-                <div class="bg-white/5 border border-white/10 rounded-xl p-3">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Total Tiket Masuk</span>
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Total Tiket Masuk</span>
                     <div class="flex items-baseline gap-2 mt-1">
-                        <span class="text-2xl font-black text-white font-mono">{{ $totalTicketsAll }}</span>
-                        <span class="text-[11px] text-slate-400">Semua Kategori</span>
+                        <span class="text-3xl font-black text-slate-900 font-mono">{{ $totalTicketsAll }}</span>
+                        <span class="text-[11px] text-slate-500 font-medium">Semua Dimensi</span>
                     </div>
                 </div>
-                <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-amber-300 block">Menunggu Respon</span>
+
+                <div class="p-3.5 rounded-xl border border-amber-200 bg-amber-50/50">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 block">Menunggu Respon</span>
                     <div class="flex items-baseline gap-2 mt-1">
-                        <span class="text-2xl font-black text-amber-400 font-mono">{{ $openTickets }}</span>
-                        <span class="text-[11px] text-amber-300/80">Tiket Baru</span>
+                        <span class="text-3xl font-black text-amber-600 font-mono">{{ $openTickets }}</span>
+                        <span class="text-[11px] text-amber-700/80 font-medium">Tiket Baru</span>
                     </div>
                 </div>
-                <div class="bg-sky-500/10 border border-sky-500/30 rounded-xl p-3">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-sky-300 block">Dalam Penanganan</span>
+
+                <div class="p-3.5 rounded-xl border border-sky-200 bg-sky-50/50">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-sky-700 block">Dalam Penanganan</span>
                     <div class="flex items-baseline gap-2 mt-1">
-                        <span class="text-2xl font-black text-sky-400 font-mono">{{ $inProgressTickets }}</span>
-                        <span class="text-[11px] text-sky-300/80">Diproses Staff</span>
+                        <span class="text-3xl font-black text-sky-600 font-mono">{{ $inProgressTickets }}</span>
+                        <span class="text-[11px] text-sky-700/80 font-medium">Diproses Staff</span>
                     </div>
                 </div>
-                <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-300 block">Terselesaikan</span>
+
+                <div class="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 block">Terselesaikan</span>
                     <div class="flex items-baseline gap-2 mt-1">
-                        <span class="text-2xl font-black text-emerald-400 font-mono">{{ $resolvedTickets }}</span>
-                        <span class="text-[11px] text-emerald-300/80">Selesai & SLA</span>
+                        <span class="text-3xl font-black text-emerald-600 font-mono">{{ $resolvedTickets }}</span>
+                        <span class="text-[11px] text-emerald-700/80 font-medium">Tuntas SLA</span>
                     </div>
                 </div>
-                <div class="bg-rose-500/10 border border-rose-500/30 rounded-xl p-3 col-span-2 sm:col-span-1">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-rose-300 block">Prioritas Urgent</span>
+
+                <div class="p-3.5 rounded-xl border border-rose-200 bg-rose-50/50 col-span-2 sm:col-span-1">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-rose-700 block">Prioritas Urgent</span>
                     <div class="flex items-baseline gap-2 mt-1">
-                        <span class="text-2xl font-black text-rose-400 font-mono">{{ $urgentTickets }}</span>
-                        <span class="text-[11px] text-rose-300/80">Tinggi / Darurat</span>
+                        <span class="text-3xl font-black text-rose-600 font-mono">{{ $urgentTickets }}</span>
+                        <span class="text-[11px] text-rose-700/80 font-medium">Tinggi / Darurat</span>
                     </div>
                 </div>
             </div>
