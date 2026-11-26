@@ -13,7 +13,7 @@ class AttendanceController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->isAdmin()) {
+        if ($user->isStaff()) {
             $query = Attendance::with('student')->latest('tanggal');
 
             if ($request->filled('tanggal')) {

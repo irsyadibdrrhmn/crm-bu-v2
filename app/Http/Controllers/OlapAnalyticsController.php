@@ -39,6 +39,14 @@ class OlapAnalyticsController extends Controller
             $baseQuery->where('status', $selectedStatus);
         }
 
+        // 0. REAL-TIME BAROMETER TIKET (Monitoring Langsung Setiap Inputan Baru)
+        $totalTicketsAll = (clone $baseQuery)->count();
+        $openTickets = (clone $baseQuery)->where('status', 'menunggu')->count();
+        $inProgressTickets = (clone $baseQuery)->where('status', 'diproses')->count();
+        $resolvedTickets = (clone $baseQuery)->where('status', 'selesai')->count();
+        $urgentTickets = (clone $baseQuery)->whereIn('urgensi', ['tinggi', 'darurat'])->count();
+        $lastRefreshedAt = now()->format('H:i:s d/m/Y');
+
         // 1. FASE ANALYTICAL CRM METRICS (Rahman et al., 2018)
         // Fase 1: ACQUIRE (Kemudahan akses & partisipasi pengguna portal)
         $totalUsers = User::count();
@@ -68,28 +76,33 @@ class OlapAnalyticsController extends Controller
             ->value('avg_hours') ?? 0;
 
         // 2. OPERASI OLAP CROSSTAB 1: Matriks Dimensi Kategori x Dimensi Stakeholder Pelapor
-        $crosstabStakeholder = ComplaintTicket::select(
+        $crosstabStakeholder = (clone $baseQuery)->select(
             'kategori',
-            DB::raw("SUM(CASE WHEN pelapor_role = 'parent' THEN 1 ELSE 0 END) as total_parent"),
-            DB::raw("SUM(CASE WHEN pelapor_role = 'student' THEN 1 ELSE 0 END) as total_student"),
             DB::raw("SUM(CASE WHEN pelapor_role = 'guru' THEN 1 ELSE 0 END) as total_guru"),
             DB::raw("SUM(CASE WHEN pelapor_role = 'bk' THEN 1 ELSE 0 END) as total_bk"),
+            DB::raw("SUM(CASE WHEN pelapor_role = 'parent' THEN 1 ELSE 0 END) as total_parent"),
+            DB::raw("SUM(CASE WHEN pelapor_role = 'student' THEN 1 ELSE 0 END) as total_student"),
+            DB::raw("SUM(CASE WHEN pelapor_role = 'admin' THEN 1 ELSE 0 END) as total_admin"),
             DB::raw("COUNT(*) as total_kategori")
         )
             ->groupBy('kategori')
             ->get();
 
-        // 3. OPERASI OLAP CROSSTAB 2: Matriks Dimensi Kategori x Dimensi Urgensi & SLA Kinerja
+        // 3. OPERASI OLAP CROSSTAB 2: Matriks Dimensi Kategori x Dimensi Urgensi, Status & SLA Kinerja
         $caseHourExpr = $isMysql
             ? "TIMESTAMPDIFF(HOUR, created_at, resolved_at)"
             : "((julianday(resolved_at) - julianday(created_at)) * 24)";
 
-        $crosstabSla = ComplaintTicket::select(
+        $crosstabSla = (clone $baseQuery)->select(
             'kategori',
             DB::raw("SUM(CASE WHEN urgensi = 'darurat' THEN 1 ELSE 0 END) as total_darurat"),
             DB::raw("SUM(CASE WHEN urgensi = 'tinggi' THEN 1 ELSE 0 END) as total_tinggi"),
             DB::raw("SUM(CASE WHEN urgensi = 'sedang' THEN 1 ELSE 0 END) as total_sedang"),
             DB::raw("SUM(CASE WHEN urgensi = 'rendah' THEN 1 ELSE 0 END) as total_rendah"),
+            DB::raw("SUM(CASE WHEN status = 'menunggu' THEN 1 ELSE 0 END) as total_menunggu"),
+            DB::raw("SUM(CASE WHEN status = 'diproses' THEN 1 ELSE 0 END) as total_diproses"),
+            DB::raw("SUM(CASE WHEN status = 'selesai' THEN 1 ELSE 0 END) as total_selesai"),
+            DB::raw("COUNT(*) as total_tiket_kategori"),
             DB::raw("ROUND(AVG(CASE WHEN resolved_at IS NOT NULL THEN {$caseHourExpr} ELSE NULL END), 1) as avg_jam_tuntas"),
             DB::raw("ROUND(AVG(rating_kepuasan), 1) as avg_csat")
         )
@@ -125,7 +138,7 @@ class OlapAnalyticsController extends Controller
 
         // 5. CHART DATA UNTUK VISUALISASI BUSINESS INTELLIGENCE
         // Tren Distribusi Stakeholder Pelapor
-        $stakeholderDistribution = ComplaintTicket::select('pelapor_role', DB::raw('count(*) as total'))
+        $stakeholderDistribution = (clone $baseQuery)->select('pelapor_role', DB::raw('count(*) as total'))
             ->groupBy('pelapor_role')
             ->get();
 
@@ -140,6 +153,12 @@ class OlapAnalyticsController extends Controller
             'selectedRole',
             'selectedUrgensi',
             'selectedStatus',
+            'totalTicketsAll',
+            'openTickets',
+            'inProgressTickets',
+            'resolvedTickets',
+            'urgentTickets',
+            'lastRefreshedAt',
             'totalUsers',
             'activeParents',
             'activeStudents',

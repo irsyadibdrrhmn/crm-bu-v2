@@ -22,6 +22,78 @@
     </x-slot>
 
     <div class="space-y-6">
+        <!-- 0. REAL-TIME DATA STATUS & TICKET BAROMETER -->
+        <div class="panel p-5 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shadow-xl border border-indigo-900/50">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-4 border-b border-indigo-800/40">
+                <div class="flex items-center gap-3">
+                    <span class="relative flex h-3.5 w-3.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500"></span>
+                    </span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-sm font-extrabold uppercase tracking-widest text-emerald-400">Sinkronisasi Database Real-Time Aktif</h2>
+                            <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-mono font-bold">LIVE OLAP</span>
+                        </div>
+                        <p class="text-xs text-slate-300 mt-0.5">
+                            Setiap penambahan atau pembaruan tiket aduan dari <strong>Siswa</strong>, <strong>Orang Tua</strong>, <strong>Guru</strong>, maupun <strong>BK</strong> langsung terakumulasi ke dalam kalkulasi matriks analitik detik ini.
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="text-right">
+                        <span class="text-[10px] text-slate-400 block uppercase tracking-wider font-semibold">Waktu Pembaruan Data:</span>
+                        <span class="text-xs font-mono font-bold text-slate-200">{{ $lastRefreshedAt }}</span>
+                    </div>
+                    <button onclick="window.location.reload()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shadow">
+                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Segarkan Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- Barometer Grid Counter -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 pt-4">
+                <div class="bg-white/5 border border-white/10 rounded-xl p-3">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Total Tiket Masuk</span>
+                    <div class="flex items-baseline gap-2 mt-1">
+                        <span class="text-2xl font-black text-white font-mono">{{ $totalTicketsAll }}</span>
+                        <span class="text-[11px] text-slate-400">Semua Kategori</span>
+                    </div>
+                </div>
+                <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-amber-300 block">Menunggu Respon</span>
+                    <div class="flex items-baseline gap-2 mt-1">
+                        <span class="text-2xl font-black text-amber-400 font-mono">{{ $openTickets }}</span>
+                        <span class="text-[11px] text-amber-300/80">Tiket Baru</span>
+                    </div>
+                </div>
+                <div class="bg-sky-500/10 border border-sky-500/30 rounded-xl p-3">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-sky-300 block">Dalam Penanganan</span>
+                    <div class="flex items-baseline gap-2 mt-1">
+                        <span class="text-2xl font-black text-sky-400 font-mono">{{ $inProgressTickets }}</span>
+                        <span class="text-[11px] text-sky-300/80">Diproses Staff</span>
+                    </div>
+                </div>
+                <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-300 block">Terselesaikan</span>
+                    <div class="flex items-baseline gap-2 mt-1">
+                        <span class="text-2xl font-black text-emerald-400 font-mono">{{ $resolvedTickets }}</span>
+                        <span class="text-[11px] text-emerald-300/80">Selesai & SLA</span>
+                    </div>
+                </div>
+                <div class="bg-rose-500/10 border border-rose-500/30 rounded-xl p-3 col-span-2 sm:col-span-1">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-rose-300 block">Prioritas Urgent</span>
+                    <div class="flex items-baseline gap-2 mt-1">
+                        <span class="text-2xl font-black text-rose-400 font-mono">{{ $urgentTickets }}</span>
+                        <span class="text-[11px] text-rose-300/80">Tinggi / Darurat</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- 1. FASE CRM FRAMEWORK (Rahman et al., 2018) -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <!-- Fase 1: Acquire -->
@@ -159,6 +231,7 @@
                         <option value="bk" {{ $selectedRole === 'bk' ? 'selected' : '' }}>Guru BP / BK</option>
                         <option value="parent" {{ $selectedRole === 'parent' ? 'selected' : '' }}>Orang Tua Siswa</option>
                         <option value="student" {{ $selectedRole === 'student' ? 'selected' : '' }}>Siswa Aktif</option>
+                        <option value="admin" {{ $selectedRole === 'admin' ? 'selected' : '' }}>Staf / Tata Usaha (Admin)</option>
                     </select>
                 </div>
 
@@ -205,7 +278,7 @@
                         <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">OLAP Crosstab Matrix 1</span>
                         <h3 class="text-base font-bold text-slate-900">Distribusi Kategori Keluhan \(\times\) Stakeholder Pelapor</h3>
                     </div>
-                    <p class="text-xs text-slate-500 mt-0.5">Analisis tabulasi silang aduan yang diinput oleh Guru/Wali, Guru BP/BK, Orang Tua, dan Siswa.</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Analisis tabulasi silang aduan yang diinput oleh Guru/Wali, Guru BP/BK, Orang Tua, Siswa, dan Staf.</p>
                 </div>
                 <span class="text-xs text-slate-400 font-mono">Aggregated via SQL Cube Group-By</span>
             </div>
@@ -219,7 +292,8 @@
                             <th class="text-center bg-purple-50 text-purple-800">Guru BP / BK</th>
                             <th class="text-center bg-sky-50 text-sky-800">Orang Tua</th>
                             <th class="text-center bg-amber-50 text-amber-800">Siswa Aktif</th>
-                            <th class="text-center bg-slate-100 text-slate-900 font-bold">Total Aduan (Sub-Total)</th>
+                            <th class="text-center bg-slate-100 text-slate-800">Staf / Admin</th>
+                            <th class="text-center bg-indigo-50 text-indigo-900 font-bold">Total Aduan (Sub-Total)</th>
                             <th>Dominasi Pelapor</th>
                         </tr>
                     </thead>
@@ -231,6 +305,7 @@
                                 if ($row->total_student > $maxVal) { $maxRole = 'Siswa'; $maxVal = $row->total_student; }
                                 if ($row->total_guru > $maxVal) { $maxRole = 'Guru / Wali'; $maxVal = $row->total_guru; }
                                 if ($row->total_bk > $maxVal) { $maxRole = 'Guru BP/BK'; $maxVal = $row->total_bk; }
+                                if ($row->total_admin > $maxVal) { $maxRole = 'Staf/Admin'; $maxVal = $row->total_admin; }
                             @endphp
                             <tr>
                                 <td class="font-bold text-slate-900 capitalize">
@@ -248,7 +323,10 @@
                                 <td class="text-center font-semibold text-amber-700 bg-amber-50/30">
                                     {{ $row->total_student }}
                                 </td>
-                                <td class="text-center font-extrabold text-slate-900 bg-slate-50">
+                                <td class="text-center font-semibold text-slate-700 bg-slate-100/50">
+                                    {{ $row->total_admin }}
+                                </td>
+                                <td class="text-center font-extrabold text-indigo-900 bg-indigo-50/40">
                                     {{ $row->total_kategori }} Tiket
                                 </td>
                                 <td>
@@ -259,7 +337,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center py-8 text-xs text-slate-400">
+                                <td colspan="8" class="text-center py-8 text-xs text-slate-400">
                                     Tidak ada data aduan pada dimensi yang dipilih.
                                 </td>
                             </tr>
@@ -275,9 +353,9 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="text-xs font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">OLAP Crosstab Matrix 2</span>
-                        <h3 class="text-base font-bold text-slate-900">Tingkat Urgensi, SLA Resolusi, & Indeks Kepuasan (CSAT)</h3>
+                        <h3 class="text-base font-bold text-slate-900">Dimensi Urgensi, Status Tiket, & SLA Kinerja Resolusi</h3>
                     </div>
-                    <p class="text-xs text-slate-500 mt-0.5">Analisis efektivitas penyelesaian masalah berdasarkan kecepatan tanggap jam dan ulasan kepuasan.</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Analisis efektivitas penyelesaian masalah berdasarkan status penanganan, kecepatan jam resolusi, dan kepuasan CSAT.</p>
                 </div>
             </div>
 
@@ -286,11 +364,15 @@
                     <thead>
                         <tr>
                             <th>Kategori Masalah</th>
+                            <th class="text-center bg-slate-100 text-slate-900 font-bold">Total</th>
+                            <th class="text-center text-amber-700 bg-amber-50/40">Menunggu</th>
+                            <th class="text-center text-sky-700 bg-sky-50/40">Diproses</th>
+                            <th class="text-center text-emerald-700 bg-emerald-50/40">Selesai</th>
                             <th class="text-center text-rose-700">Darurat</th>
                             <th class="text-center text-amber-700">Tinggi</th>
                             <th class="text-center text-sky-700">Sedang</th>
                             <th class="text-center text-slate-700">Rendah</th>
-                            <th class="text-center bg-indigo-50 text-indigo-900 font-bold">Rata-Rata Waktu Resolusi</th>
+                            <th class="text-center bg-indigo-50 text-indigo-900 font-bold">Rata-Rata Jam Resolusi</th>
                             <th class="text-center bg-amber-50 text-amber-900 font-bold">Rata-Rata CSAT</th>
                             <th>Status Kinerja SLA</th>
                         </tr>
@@ -300,6 +382,18 @@
                             <tr>
                                 <td class="font-bold text-slate-900 capitalize">
                                     {{ str_replace('_', ' ', $row->kategori) }}
+                                </td>
+                                <td class="text-center font-extrabold text-slate-900 bg-slate-50">
+                                    {{ $row->total_tiket_kategori }}
+                                </td>
+                                <td class="text-center font-bold text-amber-600 bg-amber-50/20">
+                                    {{ $row->total_menunggu }}
+                                </td>
+                                <td class="text-center font-bold text-sky-600 bg-sky-50/20">
+                                    {{ $row->total_diproses }}
+                                </td>
+                                <td class="text-center font-bold text-emerald-600 bg-emerald-50/20">
+                                    {{ $row->total_selesai }}
                                 </td>
                                 <td class="text-center font-bold text-rose-600">
                                     {{ $row->total_darurat }}
@@ -331,7 +425,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center py-8 text-xs text-slate-400">
+                                <td colspan="12" class="text-center py-8 text-xs text-slate-400">
                                     Tidak ada data untuk ditampilkan.
                                 </td>
                             </tr>
@@ -450,6 +544,7 @@
                 'bk' => 'Guru BP / BK',
                 'parent' => 'Orang Tua',
                 'student' => 'Siswa',
+                'admin' => 'Staf / Admin',
                 default => ucfirst($r)
             })) !!};
             const stakeholderData = {!! json_encode($stakeholderDistribution->pluck('total')) !!};
@@ -458,10 +553,10 @@
             new Chart(ctxStakeholder, {
                 type: 'pie',
                 data: {
-                    labels: stakeholderLabels.length ? stakeholderLabels : ['Orang Tua', 'Siswa', 'Guru', 'Guru BP/BK'],
+                    labels: stakeholderLabels.length ? stakeholderLabels : ['Orang Tua', 'Siswa', 'Guru', 'Guru BP/BK', 'Staf/Admin'],
                     datasets: [{
-                        data: stakeholderData.length ? stakeholderData : [3, 2, 1, 1],
-                        backgroundColor: ['#0284c7', '#f59e0b', '#10b981', '#8b5cf6'],
+                        data: stakeholderData.length ? stakeholderData : [3, 2, 1, 1, 1],
+                        backgroundColor: ['#0284c7', '#f59e0b', '#10b981', '#8b5cf6', '#64748b'],
                         borderWidth: 2
                     }]
                 },

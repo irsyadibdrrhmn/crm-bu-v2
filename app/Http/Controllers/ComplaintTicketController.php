@@ -63,6 +63,7 @@ class ComplaintTicketController extends Controller
             'judul' => 'required|string|max:255',
             'kategori' => 'required|in:akademik,fasilitas,keuangan,kedisiplinan,layanan_konseling,administrasi,ekstrakurikuler',
             'urgensi' => 'required|in:rendah,sedang,tinggi,darurat',
+            'pelapor_role' => 'nullable|string|in:guru,bk,parent,student,admin',
             'deskripsi' => 'required|string',
             'faktor_penyebab' => 'nullable|string',
             'tindakan_solusi' => 'nullable|string',
@@ -71,6 +72,7 @@ class ComplaintTicketController extends Controller
         ]);
 
         $user = auth()->user();
+        $pelaporRole = ($user->isStaff() && $request->filled('pelapor_role')) ? $request->pelapor_role : $user->role;
 
         // Kalkulasi Analitik SLA Target Hours & Skor Prioritas (Analytical CRM Model)
         $slaTarget = match ($request->urgensi) {
@@ -95,7 +97,7 @@ class ComplaintTicketController extends Controller
             default => 15,
         };
 
-        $bobotPelapor = match ($user->role) {
+        $bobotPelapor = match ($pelaporRole) {
             'guru', 'bk' => 30,
             'parent' => 25,
             'student' => 20,
@@ -130,7 +132,7 @@ class ComplaintTicketController extends Controller
         $ticket = ComplaintTicket::create([
             'ticket_number' => $ticketNumber,
             'user_id' => $user->id,
-            'pelapor_role' => $user->role,
+            'pelapor_role' => $pelaporRole,
             'student_id' => $request->student_id,
             'kategori' => $request->kategori,
             'urgensi' => $request->urgensi,

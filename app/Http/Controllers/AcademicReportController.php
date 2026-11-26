@@ -13,7 +13,7 @@ class AcademicReportController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->isAdmin()) {
+        if ($user->isStaff()) {
             $query = Student::with('academicReports')->orderBy('kelas')->orderBy('nama_lengkap');
 
             if ($request->filled('kelas')) {

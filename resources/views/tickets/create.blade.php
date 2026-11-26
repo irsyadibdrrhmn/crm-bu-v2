@@ -32,6 +32,23 @@
                     </div>
                 @endif
 
+                @if (auth()->user()->isStaff())
+                    <!-- Dimensi Stakeholder Pelapor (Khusus Staf/Guru/BK) -->
+                    <div>
+                        <label class="label-modern">Dimensi Stakeholder Pelapor <span class="text-rose-500">*</span></label>
+                        <select name="pelapor_role" class="input-modern" required>
+                            <option value="{{ auth()->user()->role }}" selected>Laporan dari Saya Sendiri ({{ auth()->user()->role_label }})</option>
+                            <option value="guru" {{ old('pelapor_role') === 'guru' ? 'selected' : '' }}>Guru Mata Pelajaran / Wali Kelas</option>
+                            <option value="bk" {{ old('pelapor_role') === 'bk' ? 'selected' : '' }}>Guru Bimbingan Konseling (BP/BK)</option>
+                            <option value="parent" {{ old('pelapor_role') === 'parent' ? 'selected' : '' }}>Orang Tua / Wali Siswa</option>
+                            <option value="student" {{ old('pelapor_role') === 'student' ? 'selected' : '' }}>Siswa Aktif</option>
+                            <option value="admin" {{ old('pelapor_role') === 'admin' ? 'selected' : '' }}>Manajemen Sekolah / Admin</option>
+                        </select>
+                        <p class="text-[11px] text-slate-500 mt-1">Pilih pihak pelapor agar terklasifikasi secara akurat pada matriks analitik OLAP.</p>
+                        <x-input-error :messages="$errors->get('pelapor_role')" class="mt-1" />
+                    </div>
+                @endif
+
                 <!-- Kategori -->
                 <div>
                     <label class="label-modern">Kategori Layanan <span class="text-rose-500">*</span></label>
